@@ -30,7 +30,17 @@ class YuklemeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.yukleButton.setOnClickListener { yukleTiklandi(it) }
+        binding.imageView2.setOnClickListener { gorselSec(it) }
     }
+
+    fun yukleTiklandi(view:View){
+
+    }
+    fun gorselSec(view: View){
+
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
