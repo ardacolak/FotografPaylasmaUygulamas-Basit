@@ -1,4 +1,4 @@
-package com.ardacolak.fotografpaylasma
+package com.ardacolak.fotografpaylasma.view
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -19,9 +19,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.ardacolak.fotografpaylasma.databinding.FragmentKullaniciBinding
+import androidx.navigation.Navigation
 import com.ardacolak.fotografpaylasma.databinding.FragmentYuklemeBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
+import java.sql.Timestamp
+import java.util.UUID
 
 class YuklemeFragment : Fragment() {
     private var _binding: FragmentYuklemeBinding? = null
@@ -33,10 +42,18 @@ class YuklemeFragment : Fragment() {
     var secilenGorsel : Uri?=null
     var secilenBitmap : Bitmap?=null
 
+    private lateinit var auth : FirebaseAuth
+    private lateinit var storage : FirebaseStorage
+    private lateinit var db : FirebaseFirestore
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth= Firebase.auth
+        storage=Firebase.storage
+        db=Firebase.firestore
         registerLauncer()
+
 
     }
 
@@ -56,6 +73,42 @@ class YuklemeFragment : Fragment() {
     }
 
     fun yukleTiklandi(view:View){
+        var uuid = UUID.randomUUID()
+        var gorselAdi = "${uuid}.jpg"
+        val reference = storage.reference
+        val gorselReferansi= reference.child("images").child(gorselAdi)
+        if (secilenGorsel !=null){
+            gorselReferansi.putFile(secilenGorsel!!).addOnSuccessListener {uploadTask ->
+                //urlyi alma islemi yapacağız
+                gorselReferansi.downloadUrl.addOnSuccessListener {uri->
+                    if(auth.currentUser !=null){
+                        val downlandUrl = uri.toString()
+                        // veritabanina kayit yapmamiz gerekiyor.
+                        val postMap = hashMapOf<String , Any>()
+                        postMap.put("dowlandUrl",downlandUrl)
+                        postMap.put("email",auth.currentUser?.email.toString())
+                        postMap.put("comment",binding.commentText.text.toString())
+                        postMap.put("date",com.google.firebase.Timestamp.now())
+
+                        db.collection("Posts").add(postMap).addOnSuccessListener {DocumentReference->
+                            //veri databaseye yüklenmiş oluyor.
+                            val action=YuklemeFragmentDirections.actionYuklemeFragmentToFeedFragment()
+                            Navigation.findNavController(view).navigate(action)
+                        }.addOnFailureListener{exception->
+                            Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG)
+                        }
+                    }
+                }
+
+
+            }.addOnFailureListener{exception ->
+                Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+
+
 
     }
     fun gorselSec(view: View){
@@ -97,7 +150,7 @@ class YuklemeFragment : Fragment() {
 
                 }else{
                     //izin istememiz lazım
-                    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE )
                 }
 
             }else{

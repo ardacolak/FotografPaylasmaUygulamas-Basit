@@ -1,6 +1,5 @@
-package com.ardacolak.fotografpaylasma
+package com.ardacolak.fotografpaylasma.view
 
-import android.graphics.Path.Direction
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.widget.Toast
 import androidx.navigation.Navigation
 import com.ardacolak.fotografpaylasma.databinding.FragmentKullaniciBinding
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
