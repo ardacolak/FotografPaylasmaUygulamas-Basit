@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="50dp"
+    android:background="@drawable/border"
+    >
 
     <TextView
         android:id="@+id/recyclerEmailText"
@@ -26,10 +29,11 @@
         android:id="@+id/recyclerCommentText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Kullanıcı Email"
+        android:text="Kullanıcı yorum"
         android:textSize="15sp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
         >
     </TextView>
 </LinearLayout>
